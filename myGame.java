@@ -37,6 +37,10 @@ class Fundies2Game extends World{
         this.missile.moveMissile(),
         this.score + killed);
   }
+ public WorldEnd stopWhen(){
+   return new WorldEnd(false, this.makeImage());
+ }
+ 
  public WorldImage makeText(){
    return new TextImage(new Posn(this.width - 35, this.height - 10), 
        "score:"+this.score, 15, 1, new Yellow());
@@ -65,13 +69,17 @@ class Ship{
     this.f = f; // frames since last fired
   }
   Ship moveShip(String ke){
-    if (ke.equals("left"))
+    if (ke.equals("left") &&
+        this.p.x >= 35)
       return new Ship(new Posn(this.p.x - 10, this.p.y), this.lives, this.f);
-    if (ke.equals("right"))
+    if (ke.equals("right") &&
+        this.p.x <= 265)
       return new Ship(new Posn(this.p.x + 10, this.p.y), this.lives, this.f);
-    if (ke.equals("up"))
+    if (ke.equals("up") &&
+        this.p.y >= 35)
       return new Ship(new Posn(this.p.x, this.p.y - 10), this.lives, this.f);
-    if (ke.equals("down"))
+    if (ke.equals("down") &&
+        this.p.y <= 565)
       return new Ship(new Posn(this.p.x, this.p.y + 10), this.lives, this.f);
     if (ke.equals(" ") && (this.f > 3))
       return new Ship(new Posn(this.p.x, this.p.y), this.lives, 0);
@@ -111,6 +119,11 @@ class Alien{
   boolean collides(Missile m){
     return this.distanceFromExplosion(m) <= m.radius;
   }
+  int distanceToShip(Ship s){
+    double dx = Math.pow((this.p.x - s.p.x), 2);
+    double dy = Math.pow((this.p.y - s.p.y), 2);
+    return (int)Math.round(Math.sqrt(dx + dy));
+  }
 }
 
 interface ListofAliens{
@@ -119,6 +132,7 @@ interface ListofAliens{
   ListofAliens spawn();
   ListofAliens collisions(Missile m);
   int aliensKilled(Missile m);
+  boolean hitShip(Ship s);
 };
 
 abstract class AListofAliens implements ListofAliens{
@@ -166,6 +180,12 @@ class consAlien extends AListofAliens{
     else 
       return 0;
   }
+  public boolean hitShip(Ship s){
+    if(this.first.distanceToShip(s) < 45)
+      return true;
+    else 
+      return this.rest.hitShip(s);
+  }
 }
 
 class mtAlien extends AListofAliens{
@@ -180,6 +200,9 @@ class mtAlien extends AListofAliens{
   }
   public int aliensKilled(Missile m){
     return 0;
+  }
+  public boolean hitShip(Ship s){
+    return false;
   }
 }
 
