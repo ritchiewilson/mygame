@@ -12,30 +12,30 @@ class Fundies2Game extends World{
   int width = 300;
   Ship ship;
   ListofAliens LoA;
-  ListofMissiles LoM;
+  Missile missile;
   
-  public Fundies2Game(Ship ship, ListofAliens LoA, ListofMissiles LoM){
+  public Fundies2Game(Ship ship, ListofAliens LoA, Missile missile){
     super();
     this.ship = ship;
     this.LoA = LoA;
-    this.LoM = LoM;
+    this.missile = missile;
   }
   
   public World onKeyEvent (String ke){
     return new Fundies2Game(this.ship.moveShip(ke), 
         this.LoA, 
-        this.LoM.addMissile(ke, this.ship));
+        this.missile.dropMissile(ke, this.ship));
   }
   
  public World onTick(){
    
     return new Fundies2Game(this.ship.updateTimeSinceFired(), 
         this.LoA.spawn().moveLoA(), 
-        this.LoM.moveLoM());
+        this.missile.moveMissile());
   }
  public WorldImage makeImage(){
     return new OverlayImages(this.ship.drawShip(), 
-        new OverlayImages(this.LoA.drawLoA(), this.LoM.drawLoM()));
+        new OverlayImages(this.LoA.drawLoA(), this.missile.drawMissile()));
   }
  
 
@@ -149,75 +149,49 @@ class mtAlien extends AListofAliens{
     return new DiskImage(new Posn(0, 0), 0, new White());
   }
   
-  public ListofAliens collision(ListofMissiles LoM){
-    return this;
-  }
 }
 
 
 class Missile{
   Posn p;
+  int t; //number of ticks since status change
+  String status; //missile status
   
-  Missile(Posn p){
+  Missile(Posn p, int t, String status){
     this.p = p;
+    this.t= t;
+    this.status = status;
   }
-  Missile moveMissle(){
-    return new Missile(new Posn(this.p.x, this.p.y - 10));
-  }
-  WorldImage drawMissile(){
-    return new DiskImage(this.p, 5, new Blue());
-  }
- 
-};
-
-interface ListofMissiles{
-  ListofMissiles moveLoM();
-  WorldImage drawLoM();
-  ListofMissiles addMissile(String ke, Ship s);
-}
-
-abstract class AListofMissiles implements ListofMissiles{
-  
-  public ListofMissiles addMissile(String ke, Ship s){
-    if (s.f <= 3)
-      return this;
-    if (ke.equals(" "))
-      return new consMissile(new Missile(new Posn(s.p.x, s.p.y)), this);
+  Missile moveMissile(){
+    if(this.status == "dropping" && this.t >= 10)
+      return new Missile(this.p, 0, "exploding");
+    if(this.status == "dropping")
+      return new Missile(new Posn(this.p.x, this.p.y - 10), this.t + 1,"dropping");
+    if(this.status == "exploding" && t > 10)
+      return new Missile(new Posn(0, 0), 0, "onBoard");
+    if(this.status == "exploding")
+      return new Missile(this.p, this.t + 1, "exploding");
     else 
       return this;
+    
   }
-}
-
-class consMissile extends AListofMissiles{
-  Missile first;
-  ListofMissiles rest;
-  
-  consMissile(Missile first, ListofMissiles rest){
-    this.first = first;
-    this.rest = rest;
-  }
- public ListofMissiles moveLoM(){
-    if(this.first.p.y <= 0)
-      return this.rest.moveLoM();
+  WorldImage drawMissile(){
+    if (this.status == "dropping")
+      return new DiskImage(this.p, 5, new Blue());
+    if (this.status == "exploding")
+      return new DiskImage(this.p, 50, new Blue());
     else
-      return new consMissile(this.first.moveMissle(), this.rest.moveLoM());
-  }
- public WorldImage drawLoM(){
-   return new OverlayImages(this.first.drawMissile(), this.rest.drawLoM());
- }
- 
- 
-}
-
-class mtMissile extends AListofMissiles{
-  
-  public ListofMissiles moveLoM(){
-    return this;
-  }
-  public WorldImage drawLoM(){
-    return new DiskImage(new Posn(0, 0), 0, new White());
+        return new DiskImage(this.p, 0, new White());
+    
+  } 
+  Missile dropMissile(String ke, Ship ship){
+    if(ke.equals(" ") && this.status == "onBoard")
+      return new Missile(new Posn(ship.p.x, ship.p.y), 0, "dropping");
+    else return this;
   }
 };
+
+
 
 
 
@@ -234,16 +208,12 @@ class ExamplesFundies2Game{
       new consAlien(a2,
       new consAlien(a3,
           new consAlien(a5, mt1))));
-  Missile m1 = new Missile(new Posn(150, 600));
-  Missile m2 = new Missile(new Posn(150, 590));
-  Missile m3 = new Missile(new Posn(150, 580));
-  Missile m4 = new Missile(new Posn(150, 570));
-  Missile m5 = new Missile(new Posn(150, 0));
-  ListofMissiles mt2 = new mtMissile();
-  ListofMissiles LoM1 = new consMissile(m1, 
-      new consMissile(m2,
-          new consMissile(m3,
-              new consMissile(m5, mt2))));
+  Missile m1 = new Missile(new Posn(150, 600), 0, "onBoard");
+  Missile m2 = new Missile(new Posn(150, 590), 3, "dropping");
+  Missile m3 = new Missile(new Posn(150, 580), 0, "onBoard");
+  Missile m4 = new Missile(new Posn(150, 570), 0, "onBoard");
+  Missile m5 = new Missile(new Posn(150, 0), 7, "exploding");
+  
   
   
   
@@ -251,7 +221,7 @@ class ExamplesFundies2Game{
    * Initial game screen with a ship, a list of Aliens and a list of missiles.
    * 
    */
-  Fundies2Game game = new Fundies2Game(s1, LoA1, new mtMissile());
+  Fundies2Game game = new Fundies2Game(s1, LoA1, m1);
   
   
   boolean testGame(Tester t){
@@ -260,16 +230,14 @@ class ExamplesFundies2Game{
         t.checkExpect(LoA1.moveLoA(), new consAlien(a2, 
             new consAlien(a3,
                 new consAlien(a4, mt1)))) &&
-        t.checkExpect(LoM1.moveLoM(), new consMissile(m2, 
-            new consMissile(m3,
-                new consMissile(m4, mt2)))) &&
-                
+      
                 game.bigBang(300, 600, 0.3);
     
   }
+  
+}  
     
-    
-}
+
 
 
 
