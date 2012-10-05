@@ -210,6 +210,7 @@ class Missile{
 class ExamplesFundies2Game{
   
   Ship s1 = new Ship(new Posn(150, 550), 3, 0);
+  Ship s2 = new Ship(new Posn(10, 550), 3, 0);
   Alien a1 = new Alien(new Posn(150, 0));
   Alien a2 = new Alien(new Posn(150, 10));
   Alien a3 = new Alien(new Posn(150, 20));
@@ -264,6 +265,12 @@ class ExamplesFundies2Game{
             new Missile(new Posn(0,0), 0, "onBoard", 0)) &&
         t.checkExpect(m6.moveMissile(), 
             new Missile(m6.p, 0, "exploding", 5)) &&
+        
+        // Testing dropMissile
+        t.checkExpect(m6.dropMissile(" ", s1), m6) &&
+        t.checkExpect(m3.dropMissile("t", s1), m3) &&
+        t.checkExpect(m3.dropMissile(" ", s2), 
+            new Missile(s2.p, 0, "dropping", 5)) &&
       
                 game.bigBang(300, 600, 0.3);
     
