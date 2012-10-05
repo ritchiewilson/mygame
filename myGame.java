@@ -99,11 +99,9 @@ class Alien{
     return new DiskImage(this.p, 5, new Red());
   }
   int distanceFromExplosion(Missile m){
-    //int dx2 = (this.p.x - m.p.x)^2;
-    //int dy2 = (this.p.y - m.p.y)^2;
-    //return (int)Math.round(Math.sqrt(dx2 + dy2 + 0.0));
-    return Math.abs(this.p.x - m.p.x) + Math.abs(this.p.y - m.p.y);
-
+    double dx2 = Math.pow((this.p.x - m.p.x),2);
+    double dy2 = Math.pow((this.p.y - m.p.y),2);
+    return (int)Math.round(Math.sqrt(dx2 + dy2));
   }
   boolean collides(Missile m){
     return this.distanceFromExplosion(m) <= m.radius;
@@ -274,7 +272,7 @@ class ExamplesFundies2Game{
 
         t.checkExpect(a1.distanceFromExplosion(m5), 0) &&
         t.checkExpect(a1.distanceFromExplosion(m1), 600) &&
-        t.checkExpect(a6.distanceFromExplosion(m3), 120) &&
+        t.checkExpect(a6.distanceFromExplosion(m3), 102) &&
         
         
         /*
