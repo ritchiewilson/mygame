@@ -167,7 +167,7 @@ class Missile{
       return new Missile(this.p, 0, "exploding");
     if(this.status == "dropping")
       return new Missile(new Posn(this.p.x, this.p.y - 10), this.t + 1,"dropping");
-    if(this.status == "exploding" && t > 10)
+    if(this.status == "exploding" && t > 6)
       return new Missile(new Posn(0, 0), 0, "onBoard");
     if(this.status == "exploding")
       return new Missile(this.p, this.t + 1, "exploding");
@@ -178,10 +178,12 @@ class Missile{
   WorldImage drawMissile(){
     if (this.status == "dropping")
       return new DiskImage(this.p, 5, new Blue());
-    if (this.status == "exploding")
-      return new DiskImage(this.p, 50, new Blue());
+    if (this.status == "exploding"){
+      int radius = (30 * this.t) + 5 - (4 * this.t * this.t);
+      return new DiskImage(this.p, radius, new Blue());
+    }
     else
-        return new DiskImage(this.p, 0, new White());
+      return new DiskImage(this.p, 0, new White());
     
   } 
   Missile dropMissile(String ke, Ship ship){
