@@ -30,7 +30,7 @@ class Fundies2Game extends World{
  public World onTick(){
    
     return new Fundies2Game(this.ship.updateTimeSinceFired(), 
-        this.LoA.spawn().moveLoA(), 
+        this.LoA.spawn().collisions(this.missile).moveLoA(), 
         this.missile.moveMissile());
   }
  public WorldImage makeImage(){
@@ -88,21 +88,23 @@ class Alien{
   WorldImage drawAlien(){
     return new DiskImage(this.p, 5, new Red());
   }
-//  public boolean collide(ListofMissiles LoM){
- //   if(this.p.x < LoM.first.p.x + 5 &&
-   //     this.p.x > LoM.first.p.x - 5 &&
-     //   this.p.y < LoM.first.p.y + 5 &&
-   //     this.p.y > LoM.first.p.y - 5)
-   // return true;
-   // else 
-    //  return this.collide(LoM.rest);
- // }
+  int distanceFromExplosion(Missile m){
+    //int dx2 = (this.p.x - m.p.x)^2;
+    //int dy2 = (this.p.y - m.p.y)^2;
+    //return (int)Math.round(Math.sqrt(dx2 + dy2 + 0.0));
+    return Math.abs(this.p.x - m.p.x) + Math.abs(this.p.y - m.p.y);
+
+  }
+  boolean collides(Missile m){
+    return this.distanceFromExplosion(m) <= m.radius;
+  }
 }
 
 interface ListofAliens{
   ListofAliens moveLoA();
   WorldImage drawLoA();
   ListofAliens spawn();
+  ListofAliens collisions(Missile m);
 };
 
 abstract class AListofAliens implements ListofAliens{
@@ -133,12 +135,14 @@ class consAlien extends AListofAliens{
   public WorldImage drawLoA(){
     return new OverlayImages(this.first.drawAlien(), this.rest.drawLoA());
   }
-  
-//  public ListofAliens collision(ListofMissiles LoM){
-//    if(this.first.collides(LoM))
-//      return this.rest.collision(LoM.rest);
-//    else return new consAlien(this.first, this.rest.collision(LoM))  ;
-//  }
+  public ListofAliens collisions(Missile m){
+    if (m.status != "exploding")
+      return this;
+    if(this.first.collides(m))
+      return this.rest.collisions(m);
+    else 
+      return new consAlien(this.first, this.rest.collisions(m));
+  }
 }
 
 class mtAlien extends AListofAliens{
@@ -148,7 +152,9 @@ class mtAlien extends AListofAliens{
   public WorldImage drawLoA(){
     return new DiskImage(new Posn(0, 0), 0, new White());
   }
-  
+  public ListofAliens collisions(Missile m){
+    return this;
+  }
 }
 
 
@@ -238,6 +244,8 @@ class ExamplesFundies2Game{
         t.checkExpect(LoA1.moveLoA(), new consAlien(a2, 
             new consAlien(a3,
                 new consAlien(a4, mt1)))) &&
+        //t.checkExpect(a1.distanceFromExplosion(m5), 0) &&
+        //t.checkExpect(a1.distanceFromExplosion(m1), 600) &&
       
                 game.bigBang(300, 600, 0.3);
     
