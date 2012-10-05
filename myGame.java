@@ -156,39 +156,45 @@ class Missile{
   Posn p;
   int t; //number of ticks since status change
   String status; //missile status
+  int radius;
   
-  Missile(Posn p, int t, String status){
+  Missile(Posn p, int t, String status, int radius){
     this.p = p;
     this.t= t;
     this.status = status;
+    this.radius = radius;
   }
   Missile moveMissile(){
-    if(this.status == "dropping" && this.t >= 10)
-      return new Missile(this.p, 0, "exploding");
+    int radius = 0;
     if(this.status == "dropping")
-      return new Missile(new Posn(this.p.x, this.p.y - 10), this.t + 1,"dropping");
+      radius = 5;
+    else
+      radius = (30 * this.t) + 5 - (4 * this.t * this.t);
+    if(this.status == "dropping" && this.t >= 10)
+      return new Missile(this.p, 0, "exploding", radius);
+    if(this.status == "dropping")
+      return new Missile(new Posn(this.p.x, this.p.y - 10), this.t + 1,"dropping", radius);
     if(this.status == "exploding" && t > 6)
-      return new Missile(new Posn(0, 0), 0, "onBoard");
+      return new Missile(new Posn(0, 0), 0, "onBoard", radius);
     if(this.status == "exploding")
-      return new Missile(this.p, this.t + 1, "exploding");
+      return new Missile(this.p, this.t + 1, "exploding", radius);
     else 
       return this;
     
   }
   WorldImage drawMissile(){
     if (this.status == "dropping")
-      return new DiskImage(this.p, 5, new Blue());
+      return new DiskImage(this.p, this.radius, new Blue());
     if (this.status == "exploding"){
-      int radius = (30 * this.t) + 5 - (4 * this.t * this.t);
-      return new DiskImage(this.p, radius, new Blue());
+      return new DiskImage(this.p, this.radius, new Blue());
     }
     else
-      return new DiskImage(this.p, 0, new White());
+      return new DiskImage(this.p, this.radius, new White());
     
   } 
   Missile dropMissile(String ke, Ship ship){
     if(ke.equals(" ") && this.status == "onBoard")
-      return new Missile(new Posn(ship.p.x, ship.p.y), 0, "dropping");
+      return new Missile(new Posn(ship.p.x, ship.p.y), 0, "dropping", 5);
     else return this;
   }
 };
@@ -210,11 +216,11 @@ class ExamplesFundies2Game{
       new consAlien(a2,
       new consAlien(a3,
           new consAlien(a5, mt1))));
-  Missile m1 = new Missile(new Posn(150, 600), 0, "onBoard");
-  Missile m2 = new Missile(new Posn(150, 590), 3, "dropping");
-  Missile m3 = new Missile(new Posn(150, 580), 0, "onBoard");
-  Missile m4 = new Missile(new Posn(150, 570), 0, "onBoard");
-  Missile m5 = new Missile(new Posn(150, 0), 7, "exploding");
+  Missile m1 = new Missile(new Posn(150, 600), 0, "onBoard", 0);
+  Missile m2 = new Missile(new Posn(150, 590), 3, "dropping", 5);
+  Missile m3 = new Missile(new Posn(150, 580), 0, "onBoard", 0);
+  Missile m4 = new Missile(new Posn(150, 570), 0, "onBoard", 0);
+  Missile m5 = new Missile(new Posn(150, 0), 7, "exploding", 229);
   
   
   
