@@ -255,6 +255,9 @@ class ExamplesFundies2Game{
   Missile m5 = new Missile(new Posn(150, 0), 7, "exploding", 229);
   Missile m6 = new Missile(new Posn(150, 590), 10, "dropping", 5);
   Missile m7 = new Missile(new Posn(150, 570), 0, "onBoard", 0);
+  Missile m8 = new Missile(new Posn(150, 40), 7, "exploding", 229);
+  Missile m9 = new Missile(new Posn(150, 40), 7, "onBoard", 229);
+  Missile m10 = new Missile(new Posn(150, 40), 7, "dropping", 229);
   int score = 0;
   
   
@@ -267,15 +270,52 @@ class ExamplesFundies2Game{
   
   
   boolean testGame(Tester t){
-    return t.checkExpect(s1.moveShip("up"), new Ship(new Posn(150, 540), 3, 0)) &&
+    return 
+        /*
+         * Tests for Ship methods
+         */
+        t.checkExpect(s1.moveShip("up"), new Ship(new Posn(150, 540), 3, 0)) &&
+        t.checkExpect(s1.moveShip("down"), new Ship(new Posn(150, 560), 3, 0)) &&
+        t.checkExpect(s1.moveShip("left"), new Ship(new Posn(140, 550), 3, 0)) &&
+        t.checkExpect(s1.moveShip("right"), new Ship(new Posn(160, 550), 3, 0)) &&
+        
+        t.checkExpect(s1.updateTimeSinceFired(), new Ship(s1.p, s1.lives, s1.f+1)) &&
+        
+        
+        /*
+         * Check methods on Alien
+         */
         t.checkExpect(a1.moveAlien(), new Alien(new Posn(150, 10))) &&
-        t.checkExpect(LoA1.moveLoA(), new consAlien(a2, 
-            new consAlien(a3,
-                new consAlien(a4, mt1)))) &&
-
+        t.checkExpect(a2.moveAlien(), new Alien(new Posn(150, 20))) &&
+        
         t.checkExpect(a1.distanceFromExplosion(m5), 0) &&
         t.checkExpect(a1.distanceFromExplosion(m1), 600) &&
         t.checkExpect(a6.distanceFromExplosion(m3), 102) &&
+        
+        t.checkExpect(a1.collides(m3), false) &&
+        t.checkExpect(a6.collides(m2), false) &&
+        t.checkExpect(a1.collides(m8), true) &&
+        
+        
+        /*
+         * Tests for ListAliens Methods
+         */
+        t.checkExpect(LoA1.moveLoA(), new consAlien(a2, 
+            new consAlien(a3,
+                new consAlien(a4, mt1)))) &&
+        t.checkExpect(mt1.moveLoA(), mt1) &&
+        
+        t.checkExpect(LoA1.collisions(m1), LoA1) &&
+        t.checkExpect(LoA1.collisions(m8), new consAlien(a5, mt1)) &&
+        t.checkExpect(LoA1.collisions(m9),LoA1) &&
+        t.checkExpect(LoA1.collisions(m10),LoA1) &&
+        
+        t.checkExpect(LoA1.aliensKilled(m1), 0) &&
+        t.checkExpect(LoA1.aliensKilled(m8), 3) &&
+        t.checkExpect(mt1.aliensKilled(m8), 0) &&
+        t.checkExpect(LoA1.aliensKilled(m9), 0) &&
+        t.checkExpect(LoA1.aliensKilled(m10), 0) &&
+        
         
         
         /*
