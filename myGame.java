@@ -197,14 +197,14 @@ class Missile{
     int radius = 0;
     if(this.status == "dropping")
       radius = 5;
-    else
+    else if(this.status == "exploding")
       radius = (30 * this.t) + 5 - (4 * this.t * this.t);
     if(this.status == "dropping" && this.t >= 10)
       return new Missile(this.p, 0, "exploding", radius);
     if(this.status == "dropping")
       return new Missile(new Posn(this.p.x, this.p.y - 10), this.t + 1,"dropping", radius);
     if(this.status == "exploding" && t > 6)
-      return new Missile(new Posn(0, 0), 0, "onBoard", radius);
+      return new Missile(new Posn(0, 0), 0, "onBoard", 0);
     if(this.status == "exploding")
       return new Missile(this.p, this.t + 1, "exploding", radius);
     else 
@@ -241,6 +241,7 @@ class ExamplesFundies2Game{
   Alien a3 = new Alien(new Posn(150, 20));
   Alien a4 = new Alien(new Posn(150, 30));
   Alien a5 = new Alien(new Posn(150, 600));
+  Alien a6 = new Alien(new Posn(50, 600));
   ListofAliens mt1 = new mtAlien();
   ListofAliens LoA1 = new consAlien(a1, 
       new consAlien(a2,
@@ -251,7 +252,8 @@ class ExamplesFundies2Game{
   Missile m3 = new Missile(new Posn(150, 580), 0, "onBoard", 0);
   Missile m4 = new Missile(new Posn(150, 570), 0, "onBoard", 0);
   Missile m5 = new Missile(new Posn(150, 0), 7, "exploding", 229);
-  Missile m6 = new Missile(new Posn(150, 0), 7, "exploding", 229);
+  Missile m6 = new Missile(new Posn(150, 590), 10, "dropping", 5);
+  Missile m7 = new Missile(new Posn(150, 570), 0, "onBoard", 0);
   int score = 0;
   
   
@@ -272,7 +274,7 @@ class ExamplesFundies2Game{
 
         t.checkExpect(a1.distanceFromExplosion(m5), 0) &&
         t.checkExpect(a1.distanceFromExplosion(m1), 600) &&
-        t.checkExpect(a6.distanceFromExplosion(m3), 102) &&
+        t.checkExpect(a6.distanceFromExplosion(m3), 120) &&
         
         
         /*
