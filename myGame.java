@@ -39,13 +39,16 @@ class Fundies2Game extends World{
   }
  public WorldImage makeText(){
    return new TextImage(new Posn(this.width - 35, this.height - 10), 
-       "score:"+this.score, 15, 1, new Black());
+       "score:"+this.score, 15, 1, new Yellow());
    }
  
  public WorldImage makeImage(){
-    return new OverlayImages(this.ship.drawShip(), 
-        new OverlayImages(this.LoA.drawLoA(),
-            new OverlayImages(this.missile.drawMissile(), this.makeText())));
+   WorldImage bg = new RectangleImage(new Posn(width/2,height/2), 
+       this.width, this.height, new Black());
+    return new OverlayImages(bg, 
+        new OverlayImages(this.ship.drawShip(), 
+            new OverlayImages(this.LoA.drawLoA(),
+                new OverlayImages(this.missile.drawMissile(), this.makeText()))));
   }
  
 
@@ -218,7 +221,7 @@ class Missile{
       return new DiskImage(this.p, this.radius, new Blue());
     }
     else
-      return new DiskImage(this.p, this.radius, new White());
+      return new DiskImage(this.p, this.radius, new Black());
     
   } 
   Missile dropMissile(String ke, Ship ship){
