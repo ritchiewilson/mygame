@@ -84,7 +84,7 @@ class Ship{
     return new Ship(this.p, this.lives, this.f+1);
   }
   WorldImage drawShip(){
-    return new DiskImage(this.p, 15, new Green());
+    return new FromFileImage(this.p, "galagaship.png");
   }
 }
 
