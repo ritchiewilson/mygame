@@ -172,7 +172,7 @@ class Missile{
     int radius = 0;
     if(this.status == "dropping")
       radius = 5;
-    else
+    else if (this.status == "dropping")
       radius = (30 * this.t) + 5 - (4 * this.t * this.t);
     if(this.status == "dropping" && this.t >= 10)
       return new Missile(this.p, 0, "exploding", radius);
@@ -226,6 +226,8 @@ class ExamplesFundies2Game{
   Missile m3 = new Missile(new Posn(150, 580), 0, "onBoard", 0);
   Missile m4 = new Missile(new Posn(150, 570), 0, "onBoard", 0);
   Missile m5 = new Missile(new Posn(150, 0), 7, "exploding", 229);
+  Missile m6 = new Missile(new Posn(150, 590), 10, "dropping", 5);
+  Missile m7 = new Missile(new Posn(150, 570), 0, "onBoard", 0);
   
   
   
@@ -247,6 +249,21 @@ class ExamplesFundies2Game{
         t.checkExpect(a1.distanceFromExplosion(m5), 0) &&
         t.checkExpect(a1.distanceFromExplosion(m1), 600) &&
         t.checkExpect(a6.distanceFromExplosion(m3), 102) &&
+        
+        
+        /*
+         *  Tests for Missiles
+         */
+        // Testing missile.moveMissile()
+        t.checkExpect(m1.moveMissile(), m1) &&
+        t.checkExpect(m2.moveMissile(), 
+            new Missile(new Posn(m2.p.x, m2.p.y-10), m2.t+1, "dropping", 5)) &&
+        t.checkExpect(m2.moveMissile(), 
+            new Missile(new Posn(m2.p.x, m2.p.y-10), m2.t+1, "dropping", 5)) &&
+        t.checkExpect(m5.moveMissile(), 
+            new Missile(new Posn(0,0), 0, "onBoard", 0)) &&
+        t.checkExpect(m6.moveMissile(), 
+            new Missile(m6.p, 0, "exploding", 5)) &&
       
                 game.bigBang(300, 600, 0.3);
     
