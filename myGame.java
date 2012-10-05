@@ -215,6 +215,7 @@ class ExamplesFundies2Game{
   Alien a3 = new Alien(new Posn(150, 20));
   Alien a4 = new Alien(new Posn(150, 30));
   Alien a5 = new Alien(new Posn(150, 600));
+  Alien a6 = new Alien(new Posn(250, 600));
   ListofAliens mt1 = new mtAlien();
   ListofAliens LoA1 = new consAlien(a1, 
       new consAlien(a2,
@@ -245,6 +246,7 @@ class ExamplesFundies2Game{
 
         t.checkExpect(a1.distanceFromExplosion(m5), 0) &&
         t.checkExpect(a1.distanceFromExplosion(m1), 600) &&
+        t.checkExpect(a6.distanceFromExplosion(m3), 102) &&
       
                 game.bigBang(300, 600, 0.3);
     
