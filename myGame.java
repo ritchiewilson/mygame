@@ -318,6 +318,7 @@ class ExamplesFundies2Game{
   
   Ship s1 = new Ship(new Posn(150, 550), 3, 0);
   Ship s2 = new Ship(new Posn(10, 550), 3, 0);
+  Ship initShip = new Ship(new Posn(150, 550), 1, 0);
   Alien a1 = new Alien(new Posn(150, 0));
   Alien a2 = new Alien(new Posn(150, 10));
   Alien a3 = new Alien(new Posn(150, 20));
@@ -347,7 +348,7 @@ class ExamplesFundies2Game{
    * Initial game screen with a ship, a list of Aliens and a list of missiles.
    * 
    */
-  Fundies2Game game = new Fundies2Game(s1, LoA1, m1, score);
+  Fundies2Game game = new Fundies2Game(initShip, mt1, m1, score);
   Fundies2Game game2 = new Fundies2Game(s1, LoA1, m8, 5);
   
   
