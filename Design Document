@@ -17,24 +17,3 @@ class Missile manages the only weapon of the player, the bomb.
 		have passed since the last missile was fired, and allow the next missile to 
 		be fired
 		  	
-		
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	-the Ship class consists of three parts, a posn p marking its position, 
-		an integer l measuring its remaining lives and an integer f that measures
-		how many ticks have passed since it last fired
-	-moveShip is the method that moved the ship each tick, based on the given key event
-		and a conditional that checks if the ship is still within the game boundaries
-	-updateTimeSinceFired updates the f field of the ship
-	-drawShip uses the image file galagaship.png to draw the ship 	
-	-the Alien class consists of only a posn p that marks its current location	
