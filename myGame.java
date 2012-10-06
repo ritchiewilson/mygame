@@ -5,6 +5,7 @@ import javalib.worldimages.*;
 import javalib.colors.*;
 import java.util.*;
 
+// World class
 class Fundies2Game extends World{
   
   
@@ -13,7 +14,7 @@ class Fundies2Game extends World{
   Ship ship;
   ListofAliens LoA;
   Missile missile;
-  int score;
+  int score; // keeps track of aliens destroyed
   
   public Fundies2Game(Ship ship, ListofAliens LoA, Missile missile, int score){
     super();
@@ -23,6 +24,8 @@ class Fundies2Game extends World{
     this.score = score;
   }
   
+  //produces a new world on a key event
+  //World String -> World
   public World onKeyEvent (String ke){
     return new Fundies2Game(this.ship.moveShip(ke), 
         this.LoA, 
@@ -30,6 +33,8 @@ class Fundies2Game extends World{
         this.score);
   }
   
+  //produces a new World every tick after running the move functions 
+  //World -> World
  public World onTick(){
    int killed = this.LoA.aliensKilled(this.missile);
    if(this.LoA.hitShip(this.ship))
@@ -41,15 +46,20 @@ class Fundies2Game extends World{
         this.missile.moveMissile(),
         this.score + killed);
   }
+ //produces the text image that displays the current score
+ //World -> WorldImage
  public WorldImage makeText(){
    return new TextImage(new Posn(this.width - 35, this.height - 10), 
        "score:"+this.score, 15, 1, new Yellow());
    }
+ //produces the text image that displays on game over
+ //World -> WorldImage
  public WorldImage makeGameOverText(){
    return new TextImage(new Posn(this.width/2, this.height/2),
        "Game Over", 50, 1, new Red());
  }
- 
+ //draws all the elements of the game
+ //World -> WorldImage 
  public WorldImage makeImage(){
    WorldImage bg = new RectangleImage(new Posn(width/2,height/2), 
        this.width, this.height, new Black());
@@ -65,17 +75,19 @@ class Fundies2Game extends World{
  
 
 };
-
+//contains methods that deal with the player-controlled ship
 class Ship{
-  Posn p;
-  int lives;
-  int f;
+  Posn p; //current position of the Ship
+  int lives; // remaining lives (can only be 0 or 1)
+  int f; // number of since fired
   
   Ship(Posn p, int lives, int f){
     this.p = p;
     this.lives = lives;
-    this.f = f; // frames since last fired
+    this.f = f; 
   }
+  // moves this ship based on given key events
+  // Ship String -> Ship 
   Ship moveShip(String ke){
     if (this.lives == 0)
       return this;
@@ -96,29 +108,36 @@ class Ship{
     else 
       return this;
   }
-  
-  
+  //updates the f to keep track of how many ticks have passed since last fired
+  //Ship -> Ship
   Ship updateTimeSinceFired(){
     return new Ship(this.p, this.lives, this.f+1);
   }
+  //Produces the png file that represents the ship
+  //Ship -> WorldImage
   WorldImage drawShip(){
     return new FromFileImage(this.p, "galagaship.png");
   }
 }
-
+// contains methods that deal with singular alien
 class Alien{
-  Posn p;
+  Posn p;//current position
   
   Alien(Posn p){
     this.p = p;
   }
-  
+  // moves this alien by a set amount
+  // Alien -> Alien
   Alien moveAlien(){
     return new Alien(new Posn(this.p.x, this.p.y + 10));
   }
+  //represents this Alien on the game screen
+  //Alien -> WorldImage
   WorldImage drawAlien(){
     return new DiskImage(this.p, 5, new Red());
   }
+  //calculates the distance of this alien from the given missile
+  //Alien Missile -> int
   int distanceFromExplosion(Missile m){
     //int dx2 = (this.p.x - m.p.x)^2;
     //int dy2 = (this.p.y - m.p.y)^2;
@@ -126,25 +145,42 @@ class Alien{
     return Math.abs(this.p.x - m.p.x) + Math.abs(this.p.y - m.p.y);
 
   }
+  //returns true if this alien is within the radius of the given missile
+  //Alien Missile -> boolean
   boolean collides(Missile m){
     return this.distanceFromExplosion(m) <= m.radius;
   }
+  //calculates distance of this alien from the given ship
+  //Alien Ship -> int
   int distanceToShip(Ship s){
     double dx = Math.pow((this.p.x - s.p.x), 2);
     double dy = Math.pow((this.p.y - s.p.y), 2);
     return (int)Math.round(Math.sqrt(dx + dy));
   }
 }
-
+//This interface adapts functions from the Alien class for use with a List of Aliens
 interface ListofAliens{
+  //Moves this ListofAliens using the moveAlien method
+  //ListofAliens -> ListofAliens
   ListofAliens moveLoA();
+  //draws this ListofAliens using the drawAlien method
+  //ListofAlien -> WorldImage
   WorldImage drawLoA();
+  //produces a ListofAliens that contains elements that spawned at a given y
+  //with a randomly generated x
+  //ListofAliens -> ListofAliens
   ListofAliens spawn();
+  //checks this ListofAliens against the given Missile to check for collisions
+  //ListofAliens Missile -> ListofAliens
   ListofAliens collisions(Missile m);
+  //calculates the number of aliens that collided with the given missile
+  //ListofAliens Missile -> int
   int aliensKilled(Missile m);
+  //checks if any elements of this list came into contact with the given ship 
+  //ListofAliens Ship -> boolean
   boolean hitShip(Ship s);
 };
-
+//contains methods that are consistent in both consAlien and mtAlien
 abstract class AListofAliens implements ListofAliens{
   public ListofAliens spawn(){
     Random rand = new Random();
@@ -155,9 +191,9 @@ abstract class AListofAliens implements ListofAliens{
       return this;
   }
 }
-
+//called on if there are Aliens in the list of Aliens
 class consAlien extends AListofAliens{
-  Alien first;
+  Alien first; 
   ListofAliens rest;
  
   consAlien(Alien first, ListofAliens rest){
@@ -197,8 +233,9 @@ class consAlien extends AListofAliens{
       return this.rest.hitShip(s);
   }
 }
-
+//refers to an empty list of Aliens
 class mtAlien extends AListofAliens{
+  
   public ListofAliens moveLoA(){
     return this;
   }
@@ -218,10 +255,10 @@ class mtAlien extends AListofAliens{
 
 
 class Missile{
-  Posn p;
+  Posn p; //current position
   int t; //number of ticks since status change
   String status; //missile status
-  int radius;
+  int radius;//radius of the missile
   
   Missile(Posn p, int t, String status, int radius){
     this.p = p;
@@ -229,6 +266,8 @@ class Missile{
     this.status = status;
     this.radius = radius;
   }
+  //moves this missile by a set distance 
+  //Missile -> Missile
   Missile moveMissile(){
     int radius = 0;
     if(this.status == "dropping")
@@ -247,6 +286,8 @@ class Missile{
       return this;
     
   }
+  //Draws this Missile based on what state it is in
+  //Missile -> Missile
   WorldImage drawMissile(){
     if (this.status == "dropping")
       return new DiskImage(this.p, this.radius, new Blue());
@@ -257,6 +298,8 @@ class Missile{
       return new DiskImage(this.p, this.radius, new Black());
     
   } 
+  //Creates a new missile if both the space bar is pressed and the ship has reloaded
+  //Missile String Ship -> Missile 
   Missile dropMissile(String ke, Ship ship){
     if(ke.equals(" ") && this.status == "onBoard")
       return new Missile(new Posn(ship.p.x, ship.p.y), 0, "dropping", 5);
@@ -267,7 +310,7 @@ class Missile{
 
 
 
-
+//Examples class
 class ExamplesFundies2Game{
   
   Ship s1 = new Ship(new Posn(150, 550), 3, 0);
