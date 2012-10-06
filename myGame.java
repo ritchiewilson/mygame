@@ -31,11 +31,10 @@ class Fundies2Game extends World{
   }
   
  public World onTick(){
-   int killed = this.LoA.aliensKilled(this.missile);
     return new Fundies2Game(this.ship.updateTimeSinceFired(), 
         this.LoA.spawn().collisions(this.missile).moveLoA(), 
         this.missile.moveMissile(),
-        this.score + killed);
+        this.updateScore());
   }
  public WorldImage makeText(){
    return new TextImage(new Posn(this.width - 35, this.height - 10), 
@@ -50,6 +49,10 @@ class Fundies2Game extends World{
             new OverlayImages(this.LoA.drawLoA(),
                 new OverlayImages(this.missile.drawMissile(), this.makeText()))));
   }
+ 
+ public int updateScore(){
+   return this.score + this.LoA.aliensKilled(this.missile);
+ }
  
 
 };
@@ -267,10 +270,17 @@ class ExamplesFundies2Game{
    * 
    */
   Fundies2Game game = new Fundies2Game(s1, LoA1, m1, score);
+  Fundies2Game game2 = new Fundies2Game(s1, LoA1, m8, 5);
   
   
   boolean testGame(Tester t){
     return 
+        /*
+         * Tests for Fundies2Game methods
+         */
+        t.checkExpect(game.updateScore(), 0) &&
+        t.checkExpect(game2.updateScore(), 8) &&
+        
         /*
          * Tests for Ship methods
          */
