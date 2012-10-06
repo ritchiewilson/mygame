@@ -31,6 +31,12 @@ class Fundies2Game extends World{
   }
   
  public World onTick(){
+
+   int killed = this.LoA.aliensKilled(this.missile);
+   if(this.LoA.hitShip(this.ship))
+     return new Fundies2Game(new Ship(this.ship.p, 0, this.ship.f), 
+         this.LoA, this.missile, this.score);
+   else
     return new Fundies2Game(this.ship.updateTimeSinceFired(), 
         this.LoA.spawn().collisions(this.missile).moveLoA(), 
         this.missile.moveMissile(),
@@ -40,14 +46,22 @@ class Fundies2Game extends World{
    return new TextImage(new Posn(this.width - 35, this.height - 10), 
        "score:"+this.score, 15, 1, new Yellow());
    }
+ public WorldImage makeGameOverText(){
+   return new TextImage(new Posn(this.width/2, this.height/2),
+       "Game Over", 50, 1, new Red());
+ }
  
  public WorldImage makeImage(){
    WorldImage bg = new RectangleImage(new Posn(width/2,height/2), 
        this.width, this.height, new Black());
-    return new OverlayImages(bg, 
+   WorldImage composite = new OverlayImages(bg, 
         new OverlayImages(this.ship.drawShip(), 
             new OverlayImages(this.LoA.drawLoA(),
                 new OverlayImages(this.missile.drawMissile(), this.makeText()))));
+   if(this.ship.lives == 0)
+     return new OverlayImages(composite, this.makeGameOverText());
+   else 
+     return composite;
   }
  
  public int updateScore(){
@@ -68,13 +82,19 @@ class Ship{
     this.f = f; // frames since last fired
   }
   Ship moveShip(String ke){
-    if (ke.equals("left"))
+    if (this.lives == 0)
+      return this;
+    if (ke.equals("left") &&
+        this.p.x >= 35)
       return new Ship(new Posn(this.p.x - 10, this.p.y), this.lives, this.f);
-    if (ke.equals("right"))
+    if (ke.equals("right") &&
+        this.p.x <= 265)
       return new Ship(new Posn(this.p.x + 10, this.p.y), this.lives, this.f);
-    if (ke.equals("up"))
+    if (ke.equals("up") &&
+        this.p.y >= 35)
       return new Ship(new Posn(this.p.x, this.p.y - 10), this.lives, this.f);
-    if (ke.equals("down"))
+    if (ke.equals("down") &&
+        this.p.y <= 565)
       return new Ship(new Posn(this.p.x, this.p.y + 10), this.lives, this.f);
     if (ke.equals(" ") && (this.f > 3))
       return new Ship(new Posn(this.p.x, this.p.y), this.lives, 0);
@@ -112,6 +132,11 @@ class Alien{
   boolean collides(Missile m){
     return this.distanceFromExplosion(m) <= m.radius;
   }
+  int distanceToShip(Ship s){
+    double dx = Math.pow((this.p.x - s.p.x), 2);
+    double dy = Math.pow((this.p.y - s.p.y), 2);
+    return (int)Math.round(Math.sqrt(dx + dy));
+  }
 }
 
 interface ListofAliens{
@@ -120,6 +145,7 @@ interface ListofAliens{
   ListofAliens spawn();
   ListofAliens collisions(Missile m);
   int aliensKilled(Missile m);
+  boolean hitShip(Ship s);
 };
 
 abstract class AListofAliens implements ListofAliens{
@@ -167,6 +193,12 @@ class consAlien extends AListofAliens{
     else 
       return 0;
   }
+  public boolean hitShip(Ship s){
+    if(this.first.distanceToShip(s) < 40)
+      return true;
+    else 
+      return this.rest.hitShip(s);
+  }
 }
 
 class mtAlien extends AListofAliens{
@@ -181,6 +213,9 @@ class mtAlien extends AListofAliens{
   }
   public int aliensKilled(Missile m){
     return 0;
+  }
+  public boolean hitShip(Ship s){
+    return false;
   }
 }
 
