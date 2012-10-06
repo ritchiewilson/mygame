@@ -1,0 +1,22 @@
+Starship Commander (not Galaga) User Manual
+
+Gala... Starship Commander has two main aspects to its control:
+	-The control pad: up, down, left, and right, control the movement of the ship.
+		- The ship can move anywhere so long as it does not come into contact with 
+			aliens and it stays within the game boundaries.
+	- The space bar controls the only weapon of the ship, your bomb. 
+		- Only one bomb can be fired at a time, and a second bomb cannot be fired 
+			until the first one disappears.
+		- Once the bomb is released from the ship, it will travel forward for 10 ticks 
+			before exploding outward. The explosion lasts 6 ticks, after which a new 
+			bomb can be launched. Be careful, as you are vulnerable during your reload.
+
+The objective of the game:
+	- Stay alive!
+		- Avoid direct contact with the aliens, doing so will cause you to die. 
+	- Defeat the alien invaders!
+		- You and your ship are humanities' last hope. The future of all mankind rests
+			on your shoulders. Make us proud. 
+			
+Your score is visible in the bottom right corner of the screen, and keeps track of
+	how many aliens you have destroyed in your current game. 									 	

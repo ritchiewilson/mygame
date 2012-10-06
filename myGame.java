@@ -32,27 +32,35 @@ class Fundies2Game extends World{
   
  public World onTick(){
    int killed = this.LoA.aliensKilled(this.missile);
+   if(this.LoA.hitShip(this.ship))
+     return new Fundies2Game(new Ship(this.ship.p, 0, this.ship.f), 
+         this.LoA, this.missile, this.score);
+   else
     return new Fundies2Game(this.ship.updateTimeSinceFired(), 
         this.LoA.spawn().collisions(this.missile).moveLoA(), 
         this.missile.moveMissile(),
         this.score + killed);
   }
- public WorldEnd stopWhen(){
-   return new WorldEnd(false, this.makeImage());
- }
- 
  public WorldImage makeText(){
    return new TextImage(new Posn(this.width - 35, this.height - 10), 
        "score:"+this.score, 15, 1, new Yellow());
    }
+ public WorldImage makeGameOverText(){
+   return new TextImage(new Posn(this.width/2, this.height/2),
+       "Game Over", 50, 1, new Red());
+ }
  
  public WorldImage makeImage(){
    WorldImage bg = new RectangleImage(new Posn(width/2,height/2), 
        this.width, this.height, new Black());
-    return new OverlayImages(bg, 
+   WorldImage composite = new OverlayImages(bg, 
         new OverlayImages(this.ship.drawShip(), 
             new OverlayImages(this.LoA.drawLoA(),
                 new OverlayImages(this.missile.drawMissile(), this.makeText()))));
+   if(this.ship.lives == 0)
+     return new OverlayImages(composite, this.makeGameOverText());
+   else 
+     return composite;
   }
  
 
@@ -69,6 +77,8 @@ class Ship{
     this.f = f; // frames since last fired
   }
   Ship moveShip(String ke){
+    if (this.lives == 0)
+      return this;
     if (ke.equals("left") &&
         this.p.x >= 35)
       return new Ship(new Posn(this.p.x - 10, this.p.y), this.lives, this.f);
@@ -181,7 +191,7 @@ class consAlien extends AListofAliens{
       return 0;
   }
   public boolean hitShip(Ship s){
-    if(this.first.distanceToShip(s) < 45)
+    if(this.first.distanceToShip(s) < 40)
       return true;
     else 
       return this.rest.hitShip(s);
